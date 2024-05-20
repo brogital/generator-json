@@ -220,6 +220,8 @@
                 document.getElementById('platform').value = scenario.platformIds.join(',');
                 document.getElementById('screen').value = scenario.screen;
                 document.getElementById('jsonForm').style.display = 'block';
+                document.getElementById('generateButton').style.display = 'none';
+                generateJSON();
             } else {
                 document.getElementById('jsonForm').style.display = 'block';
                 document.getElementById('title').value = '';
@@ -227,9 +229,9 @@
                 document.getElementById('type').value = '';
                 document.getElementById('platform').value = '';
                 document.getElementById('screen').value = '';
+                document.getElementById('generateButton').style.display = 'block';
+                document.getElementById('output').textContent = '';
             }
-
-            generateJSON();
         }
 
         function copyToClipboard() {
@@ -270,7 +272,7 @@
 
         <div class="block">
             <h2>Заполните поля</h2>
-            <form id="jsonForm" onsubmit="return false;">
+            <form id="jsonForm" onsubmit="generateJSON(); return false;">
                 <label for="title">Заголовок баннера (необязательно):</label><br>
                 <input type="text" id="title" name="title"><br><br>
 
@@ -285,6 +287,8 @@
 
                 <label for="screen">Screen (через запятую):</label><br>
                 <input type="text" id="screen" name="screen" required><br><br>
+
+                <input type="submit" id="generateButton" value="Сгенерировать JSON">
             </form>
         </div>
 
