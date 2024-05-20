@@ -175,7 +175,7 @@
         }
 
         function generateJSON() {
-            const title = document.getElementById('title');
+            const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
             const type = parseInt(document.getElementById('type').value);
             const platformIds = document.getElementById('platform').value.split(',').map(Number);
@@ -187,7 +187,7 @@
                 "type": type,
                 "content": content
             };
-
+console.log(title)
             if (title && typeof title === 'string') {
                 alertData.title = title.replace('-', '').trim();
             }
@@ -221,6 +221,7 @@
                 document.getElementById('screen').value = scenario.screen;
                 document.getElementById('jsonForm').style.display = 'block';
                 document.getElementById('generateButton').style.display = 'none';
+                document.getElementById('updateButton').style.display = 'block';
                 generateJSON();
             } else {
                 document.getElementById('jsonForm').style.display = 'block';
@@ -229,8 +230,9 @@
                 document.getElementById('type').value = '';
                 document.getElementById('platform').value = '';
                 document.getElementById('screen').value = '';
-                document.getElementById('generateButton').style.display = 'block';
                 document.getElementById('output').textContent = '';
+                document.getElementById('generateButton').style.display = 'block';
+                document.getElementById('updateButton').style.display = 'none';
             }
         }
 
@@ -289,6 +291,7 @@
                 <input type="text" id="screen" name="screen" required><br><br>
 
                 <input type="submit" id="generateButton" value="Сгенерировать JSON">
+                <input type="submit" id="updateButton" value="Обновить JSON">
             </form>
         </div>
 
