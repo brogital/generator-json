@@ -61,11 +61,11 @@
             overflow: auto;
         }
         .scenario-list {
-            max-height: 400px;
+            max-height: 800px;
             overflow-y: auto;
         }
         .scenario-list label {
-            margin-bottom: 10px;
+            margin: 10px 0;
             display: flex;
             align-items: center;
         }
@@ -73,7 +73,7 @@
             margin-right: 10px;
         }
         .scenario-item {
-            padding: 10px;
+            padding: 15px 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             margin-bottom: 10px;
@@ -99,21 +99,21 @@
     <script>
         const scenarios = {
             "Не работают оплаты картами | Ввод": {
-                "title": "-",
+                "title": "",
                 "content": "Оплата картой временно не\u00A0работает\u00A0— пока выбирайте другие способы",
                 "type": 0,
                 "platformIds": [1, 2, 3, 4],
                 "screen": "index,card-status,one-click-index"
             },
             "Не работает сбп | Ввод": {
-                "title": "-",
+                "title": "",
                 "content": "Оплата через\u00A0СБП временно не\u00A0работает\u00A0— пока выбирайте другие способы",
                 "type": 0,
                 "platformIds": [1, 2, 3, 4],
                 "screen": "index,sbp,sbp-bank-list,sbp-status,one-click-index,one-click-sbp-bank-list"
             },
             "Ничего не работает | Ввод": {
-                "title": "-",
+                "title": "",
                 "content": "Оплатить сейчас не\u00A0получится\u00A0— попробуйте чуть позже, скоро всё снова заработает",
                 "type": 0,
                 "platformIds": [1, 2, 3, 4],
@@ -170,6 +170,46 @@
             }
         };
 
+        function generateRandomId() {
+            return Math.floor(Math.random() * 1000) + 1;
+        }
+
+        function generateJSON() {
+            const title = document.getElementById('title');
+            const content = document.getElementById('content').value;
+            const type = parseInt(document.getElementById('type').value);
+            const platformIds = document.getElementById('platform').value.split(',').map(Number);
+            const screen = document.getElementById('screen').value.split(',');
+
+            const alertId = generateRandomId(); // генерация случайного значения alertId
+
+            const alertData = {
+                "type": type,
+                "content": content
+            };
+
+            if (title && typeof title === 'string') {
+                alertData.title = title.replace('-', '').trim();
+            }
+
+            const json = {
+                "alerts": {
+                    [alertId]: alertData
+                },
+                "screens": {}
+            };
+
+            screen.forEach(scr => {
+                json.screens[scr] = {
+                    "alertId": alertId,
+                    "platformIds": platformIds
+                };
+            });
+
+            document.getElementById('output').textContent = JSON.stringify(json, null, 2);
+            document.getElementById('copyButton').style.display = 'inline'; // Показать кнопку копирования
+        }
+
         function populateTemplate() {
             const scenarioSelect = document.querySelector('input[name="scenario"]:checked').value;
             if (scenarios[scenarioSelect]) {
@@ -188,46 +228,8 @@
                 document.getElementById('platform').value = '';
                 document.getElementById('screen').value = '';
             }
-        }
 
-        function generateRandomId() {
-            return Math.floor(Math.random() * 1000) + 1;
-        }
-
-        function generateJSON() {
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
-            const type = parseInt(document.getElementById('type').value);
-            const platformIds = document.getElementById('platform').value.split(',').map(Number);
-            const screen = document.getElementById('screen').value.split(',');
-
-            const alertId = generateRandomId(); // генерация случайного значения alertId
-
-            const alertData = {
-                "type": type,
-                "content": content
-            };
-
-            if (title) {
-                alertData.title = title;
-            }
-
-            const json = {
-                "alerts": {
-                    [alertId]: alertData
-                },
-                "screens": {}
-            };
-
-            screen.forEach(scr => {
-                json.screens[scr] = {
-                    "alertId": alertId,
-                    "platformIds": platformIds
-                };
-            });
-
-            document.getElementById('output').textContent = JSON.stringify(json, null, 4);
-            document.getElementById('copyButton').style.display = 'inline'; // Показать кнопку копирования
+            generateJSON();
         }
 
         function copyToClipboard() {
@@ -242,10 +244,10 @@
         window.addEventListener('DOMContentLoaded', (event) => {
             const scenarioContainer = document.querySelector('.scenario-list form');
             const scenariosHtml = Object.keys(scenarios).map((scenario, index) => `
-                <div class="scenario-item">
+                <label class="scenario-item">
                     <input type="radio" id="scenario_${index}" name="scenario" value="${scenario}" onclick="populateTemplate();">
-                    <label for="scenario_${index}">${scenario}</label>
-                </div>
+                    <div>${scenario}</div>
+                </label>
             `).join('');
             scenarioContainer.innerHTML += scenariosHtml;
         });
@@ -258,18 +260,18 @@
             <h2>Сценарии</h2>
             <div class="scenario-list">
                 <form>
-                    <div class="scenario-item">
+                    <label class="scenario-item">
                         <input type="radio" id="scenario_new" name="scenario" value="new" onclick="populateTemplate();">
-                        <label for="scenario_new">Новый сценарий</label>
-                    </div>
+                        <div>Новый сценарий</div>
+                    </label>
                 </form>
             </div>
         </div>
 
         <div class="block">
             <h2>Заполните поля</h2>
-            <form id="jsonForm" onsubmit="generateJSON(); return false;">
-                <label for="title">Title (необязательно):</label><br>
+            <form id="jsonForm" onsubmit="return false;">
+                <label for="title">Заголовок баннера (необязательно):</label><br>
                 <input type="text" id="title" name="title"><br><br>
 
                 <label for="content">Текст баннера:</label><br>
@@ -283,15 +285,13 @@
 
                 <label for="screen">Screen (через запятую):</label><br>
                 <input type="text" id="screen" name="screen" required><br><br>
-
-                <input type="submit" value="Сгенерировать JSON">
             </form>
         </div>
 
         <div class="block">
             <h2>Сгенерированный JSON</h2>
-            <pre id="output"></pre>
             <button id="copyButton" onclick="copyToClipboard()" style="display:none;">Скопировать JSON</button>
+            <pre id="output"></pre>
         </div>
     </div>
 </body>
